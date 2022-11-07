@@ -14,6 +14,10 @@ classdef MCSAbstract < handle
         l = getIsMoving(this, u32Channel)
            
         u32Position = getPosition(this, u32Channel)
+
+        calibrate(this, u32Channel)
+
+  
         
     end
     
