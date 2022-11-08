@@ -1,4 +1,4 @@
-classdef MCSAbstract < handle
+classdef MCS2Abstract < handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     

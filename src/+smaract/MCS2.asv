@@ -8,7 +8,7 @@
 %}
 
 
-classdef MCS2 % < smaract.MCSAbstract2
+classdef MCS2 < smaract.MCSAbstract2
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -485,7 +485,7 @@ classdef MCS2 % < smaract.MCSAbstract2
 
         dNumChannels = 1
         u32CLFrequency = 6000
-        u32MaxHoldTime = 1000
+        u32MaxHoldTime = this.SA_CTL_INFINITE
 
         dVelocity = 1000000000
         dAcceleration = 1000000000
@@ -667,6 +667,18 @@ classdef MCS2 % < smaract.MCSAbstract2
         
         
         
+        function closeSystem(this)
+            
+            u32Status = calllib(...
+                this.cNameOfLib, ...
+                'SA_CloseSystem', ...
+                this.oDeviceHandle ...
+            );
+        
+            this.printStatusOfError(u32Status)
+
+            
+        end
 
        
         function printStatusOfMovement(this, u32Status)
@@ -850,7 +862,7 @@ classdef MCS2 % < smaract.MCSAbstract2
            c = char(jFile.getCanonicalPath);
         end
         
-        function this = setDefaultPathOfDllAndHeader(this)
+        function setDefaultPathOfDllAndHeader(this)
             
             cDir = fileparts(mfilename('fullpath'));
             cDirSdk = fullfile(cDir, '..', '..', 'SDK-MCS2');
@@ -893,9 +905,7 @@ classdef MCS2 % < smaract.MCSAbstract2
         end
        
         
-        function this = init(this)
-
-            this = this.setDefaultPathOfDllAndHeader();
+        function init(this)
             
              if ~libisloaded(this.cNameOfLib)
                 loadlibrary(...
@@ -920,10 +930,7 @@ classdef MCS2 % < smaract.MCSAbstract2
                 this.setPropertyU32(uint32ChannelNumber, 'SA_CTL_PKEY_REFERENCING_OPTIONS', 0);
                 this.setPropertyU32(uint32ChannelNumber, 'SA_CTL_PKEY_CALIBRATION_OPTIONS', 0);
 
-             end
-
-             % Set some default values:
-             this.u32MaxHoldTime = this.SA_CTL_INFINITE;
+            end
             
         end
 

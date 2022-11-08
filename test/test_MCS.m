@@ -1,11 +1,9 @@
 % test_MCS
 
-
-cDir = fileparts(mfilename('fullpath'));
-addpath(fullfile(cDir, '..', 'src'));
+addpath('../src')
 
 %% Create, init, and open
-comm = smaract.MCS();
+comm = smaract.MCS2();
 
 %% Run test
 comm.runTest()
