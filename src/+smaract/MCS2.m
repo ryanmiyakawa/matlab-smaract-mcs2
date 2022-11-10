@@ -855,6 +855,8 @@ classdef MCS2 % < smaract.MCSAbstract2
             cDir = fileparts(mfilename('fullpath'));
             cDirSdk = fullfile(cDir, '..', '..', 'SDK-MCS2');
             cArch = computer('arch');
+
+            cArch = 'win32';
             
             switch cArch
                 case 'win64'
