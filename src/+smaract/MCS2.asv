@@ -1,4 +1,4 @@
-classdef MCS2 < handle %smaract.MCSAbstract2
+classdef MCS2 % < smaract.MCSAbstract2
 
     properties (Constant)
 
@@ -49,13 +49,13 @@ classdef MCS2 < handle %smaract.MCSAbstract2
         
         
         %@param {uint32} absolute position to move to in pm
-        function dResult = goToPositionAbsolute(this, u32Channel, i64Position)
+        function goToPositionAbsolute(this, u32Channel, i64Position)
         
              if (this.getIsMoving(u32Channel))
                  return
              end
               
-            dResult = this.setPropertyI64(u32Channel, this.u64SAConstants.SA_CTL_PKEY_POSITION, i64Position);
+            dResult = this.setPropertyU64(u32Channel, this.u64SAConstants.SA_CTL_PKEY_POSITION, i64Position);
             this.printStatusOfError(dResult);
             
         end
@@ -77,9 +77,8 @@ classdef MCS2 < handle %smaract.MCSAbstract2
         %@param {uint32} channel.  Use -1 for all channels
         function findReferenceMark(this, u32Channel)
             if (u32Channel == -1)
-                for k = 1:this.dNumChannels
-                    u32Channel = k - 1;
-                    this.findReferenceMark(u32Channel)
+                for k = 0:this.dNumChannels - 1
+                    this.findReferenceMark(k)
                 end
                 return
             end
@@ -95,9 +94,8 @@ classdef MCS2 < handle %smaract.MCSAbstract2
         function l = getIsReferenced(this, u32Channel)
             if (u32Channel == -1)
                 ls = zeros(1, this.dNumChannels);
-                for k = 1 : this.dNumChannels
-                    u32Channel = k - 1;
-                    ls(k) = this.getIsReferenced(u32Channel);
+                for k = 0 : this.dNumChannels - 1
+                    ls(k) = this.getIsReferenced(k);
                 end
                 l = all(ls);
                 return
@@ -139,49 +137,49 @@ classdef MCS2 < handle %smaract.MCSAbstract2
                 this.cLocation = cLocation;
             end
 
-            this = this.openSystem();
+             this = this.openSystem();
 
-            for k = 1:this.dNumChannels
+             for k = 1:this.dNumChannels
                 uint32ChannelNumber = uint32(k - 1);
 
                 % Set closed loop frequency
-                this.msg(sprintf('Initializing closed loop frequency on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI32(uint32ChannelNumber, ...
+                this.msg('Initializing closed loop frequency')
+                dStatus = this.setPropertyU32(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_MAX_CL_FREQUENCY, this.u32CLFrequency);
 
 
                 % Set hold time
-                this.msg(sprintf('Initializing hold time on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI32(uint32ChannelNumber, ...
+                dStatus = this.setPropertyU32(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_HOLD_TIME, -1);
 
                 % Set Move mode
-                this.msg(sprintf('Initializing move mode on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI32(uint32ChannelNumber, ...
+                dStatus = this.setPropertyU32(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_MOVE_MODE,  this.u64SAConstants.SA_CTL_MOVE_MODE_CL_ABSOLUTE);
-
+               
                 % Set Velocity
-                this.msg(sprintf('Initializing velocity on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI64(uint32ChannelNumber, ...
+                dStatus = this.setPropertyU64(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_MOVE_VELOCITY, this.dVelocity);
 
                 % Set Acceleration
-                this.msg(sprintf('Initializing acceleration on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI64(uint32ChannelNumber, ...
+                dStatus = this.setPropertyU64(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_MOVE_ACCELERATION, this.dAcceleration);
 
                 % Set Referencing options
-                this.msg(sprintf('Initializing referencing options on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI32(uint32ChannelNumber, ...
+                dStatus = this.setPropertyU32(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_REFERENCING_OPTIONS, 0);
-
+               
                 % Set Referencing options
-                this.msg(sprintf('Initializing calibration options on channel %d', uint32ChannelNumber))
-                dStatus = this.setPropertyI32(uint32ChannelNumber, ...
+                  dStatus = this.setPropertyU32(uint32ChannelNumber, ...
                     this.u64SAConstants.SA_CTL_PKEY_CALIBRATION_OPTIONS, 0);
-
-            end
+              
+               end
         end
+
+        
+        
+        
+        
+
     end
     
     methods (Access = protected)
@@ -351,38 +349,38 @@ classdef MCS2 < handle %smaract.MCSAbstract2
         
 
 
-        function dStatus = setPropertyI32(this, u32Channel, u64Property, i32Val)
+        function dStatus = setPropertyU32(this, u32Channel, u64Property, u32Val)
             dStatus = smaract.mcs_bridge(...
                     this.u64SAConstants.BF_SA_CTL_SetProperty_i32, ...
                     this.dHandle, ...
                     u32Channel, ...
                     u64Property, ...
-                    i32Val); 
+                    u32Val); 
             this.printStatusOfError(dStatus);
         end
 
-        function dStatus = setPropertyI64(this, u32Channel, u64Property, i64Val)
+        function dStatus = setPropertyU64(this, u32Channel, u64Property, u64Val)
             dStatus = smaract.mcs_bridge(...
                     this.u64SAConstants.BF_SA_CTL_SetProperty_i64, ...
                     this.dHandle, ...
                     u32Channel, ...
                     u64Property, ...
-                    i64Val); 
+                    u64Val); 
             this.printStatusOfError(dStatus);
         end
 
-        function [dStatus, i32Val] = getPropertyI32(this, u32Channel, i32Property)
-            [dStatus, i32Val] = smaract.mcs_bridge(...
+        function u32Val = getPropertyU32(this, u32Channel, u32Property)
+            [dStatus, u32Val] = smaract.mcs_bridge(...
                     this.u64SAConstants.BF_SA_CTL_SetProperty_i32, ...
                     this.dHandle, ...
                     u32Channel, ...
-                    i32Property); 
+                    u64Property); 
             this.printStatusOfError(dStatus);
         end
 
-        function [dStatus, i64Val] = getPropertyI64(this, u32Channel, u64Property)
-            [dStatus, i64Val] = smaract.mcs_bridge(...
-                    this.u64SAConstants.BF_SA_CTL_GetProperty_i64, ...
+        function i64Val = getPropertyI64(this, u32Channel, u64Property)
+            [dStatus, u64Val] = smaract.mcs_bridge(...
+                    this.u64SAConstants.BF_SA_CTL_SetProperty_i64, ...
                     this.dHandle, ...
                     u32Channel, ...
                     u64Property); 

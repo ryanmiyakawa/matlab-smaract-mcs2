@@ -17,18 +17,22 @@ SA_CTL_PKEY_POSITION = hex2dec('0x0305001D');
 % List devices:
 smaract.mcs_bridge(BF_LIST_DEVICES)
 
-%% Get device (not working)
+%% OPen device by name 
 
 cDeviceName = 'network:sn:MCS2-00005705';
 [dResult, dHandle] = smaract.mcs_bridge(BF_SA_CTL_Open, cDeviceName);
 
+%% Set CL Frequency
+dFrequency = 6000;
+u32Channel = 0;
+u64Property = hex2dec('0x0305002F');
+dResult =  smaract.mcs_bridge(...
+                    BF_SA_CTL_SetProperty_i32, ...
+                    dHandle, ...
+                    u32Channel, ...
+                    u64Property, ...
+                    dFrequency) 
 
-%% Get first device
-[dResult, dHandle] = smaract.mcs_bridge(BA_SA_CTL_OpenFirstDevice);
-
-
-%% Close device:
-dResult = smaract.mcs_bridge(BF_SA_CTL_Close, dHandle);
 
 %% Reference
 channel = 0;
@@ -44,10 +48,15 @@ channel = 0;
 
 %% Get position:
 channel = 0;
-dPos = smaract.mcs_bridge(BF_SA_CTL_GetProperty_i64, dHandle, 0, SA_CTL_PKEY_POSITION);
+[dResult, dPos] = smaract.mcs_bridge(BF_SA_CTL_GetProperty_i64, dHandle, 0, SA_CTL_PKEY_POSITION);
 fprintf('Channel %d is at position %0.3f\n', channel, dPos);
 
 %% Set position:
 channel = 0;
 dPos = -1000000;
-smaract.mcs_bridge(BF_SA_CTL_SetProperty_i64, dHandle, 0, SA_CTL_PKEY_POSITION, dPos);
+dResult = smaract.mcs_bridge(BF_SA_CTL_SetProperty_i64, dHandle, 0, SA_CTL_PKEY_POSITION, dPos);
+
+
+%% Close device:
+dResult = smaract.mcs_bridge(BF_SA_CTL_Close, dHandle);
+

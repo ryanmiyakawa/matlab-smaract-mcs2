@@ -15,6 +15,7 @@
 #define  strtok_s
 #endif
 
+
 SA_CTL_Result_t result;
 SA_CTL_DeviceHandle_t dHandle;
 
@@ -129,7 +130,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[])
 {
     int8_t channel;
-    int32_t val32;
+    int32_t val32, state;
     int64_t val64;
     SA_CTL_PropertyKey_t propertyKey;
     char *locator;
@@ -163,20 +164,21 @@ void mexFunction(int nlhs, mxArray *plhs[],
             // require 2 arguments
             returnIfInsufficientArgs(nrhs, 2);
 
-            locator = mxArrayToString(prhs[2]);
+            locator = mxArrayToString(prhs[1]);
+
+            // mexPrintf("locator: %s\n", locator);
             result = MXB_SA_CTL_Open(dHandle, locator);
+            // dHandle = 0;
 
-            plhs[0] = mxCreateDoubleScalar((double)dHandle);
-
-
+            plhs[1] = mxCreateDoubleScalar((double)dHandle);
             break;  
 
         case BA_SA_CTL_OpenFirstDevice:
             mexPrintf("ROUTE: BA_SA_CTL_OpenFirstDevice\n");
             result = MXB_SA_CTL_OpenFirstDevice(dHandle);
-            plhs[0] = mxCreateDoubleScalar((double)dHandle);
+            plhs[1] = mxCreateDoubleScalar((double)dHandle);
             break;  
-        break;
+
         case BF_SA_CTL_Close:
             mexPrintf("ROUTE: SA_CTL_Close\n");
 
@@ -185,8 +187,24 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
             result = SA_CTL_Close(dHandle);
             break;
+
+        case BF_IS_REFERENCED:
+            mexPrintf("ROUTE: IS_REFERENCED\n");
+
+            // require 3 arguments
+            returnIfInsufficientArgs(nrhs, 3);
+
+            result = SA_CTL_GetProperty_i32(dHandle, channel, SA_CTL_PKEY_CHANNEL_STATE, &state, 0);
+            bool isReferenced = (state & SA_CTL_CH_STATE_IS_REFERENCED) != 0;
+
+            exitOnError(result);
+            plhs[1]         = mxCreateDoubleScalar((double)isReferenced);
+
+            break;
         case BF_SA_CTL_Reference:
             mexPrintf("ROUTE: SA_CTL_Reference channel: %d.\n", channel);
+
+            returnIfInsufficientArgs(nrhs, 3);
 
             result = SA_CTL_SetProperty_i32(dHandle, channel, SA_CTL_PKEY_REFERENCING_OPTIONS, 0);
             exitOnError(result);
@@ -200,6 +218,20 @@ void mexFunction(int nlhs, mxArray *plhs[],
             result = SA_CTL_Reference(dHandle, channel, 0);
 
             break;
+        case BF_IS_CHANNEL_ACTIVE:
+            mexPrintf("ROUTE: BF_IS_CHANNEL_ACTIVE\n");
+
+            // require 3 arguments
+            returnIfInsufficientArgs(nrhs, 3);
+
+            result = SA_CTL_GetProperty_i32(dHandle, channel, SA_CTL_PKEY_CHANNEL_STATE, &state, 0);
+            bool isActive = (state & SA_CTL_CH_STATE_BIT_ACTIVELY_MOVING) != 0;
+
+            exitOnError(result);
+            plhs[1]         = mxCreateDoubleScalar((double)isActive);
+
+            break;
+
         case BF_SA_CTL_GetProperty_i64:
             mexPrintf("ROUTE: SA_CTL_GetProperty_i64\n");
 
@@ -211,7 +243,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
             result = SA_CTL_GetProperty_i64(dHandle, channel, propertyKey, &val64, 0);
             exitOnError(result);
-            plhs[0]         = mxCreateDoubleScalar((double)val64);
+            plhs[1]         = mxCreateDoubleScalar((double)val64);
             break;
         case BF_SA_CTL_GetProperty_i32:
             mexPrintf("ROUTE: SA_CTL_GetProperty_i32\n");
@@ -225,7 +257,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
             result = SA_CTL_GetProperty_i32(dHandle, channel, propertyKey, &val32, 0);
             exitOnError(result);
-            plhs[0]         = mxCreateDoubleScalar((double)val32);
+            plhs[1]         = mxCreateDoubleScalar((double)val32);
             break;
         case BF_SA_CTL_SetProperty_i64:
             mexPrintf("ROUTE: SA_CTL_SetProperty_i64\n");
@@ -253,7 +285,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             // 5th argument is property value:
             val32 = (int32_t) mxGetScalar(prhs[4]);
 
-            result = SA_CTL_SetProperty_i64(dHandle, channel, propertyKey, val32);
+            result = SA_CTL_SetProperty_i32(dHandle, channel, propertyKey, val32);
             exitOnError(result);
 
         break;
@@ -262,10 +294,12 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
         default:
             mexPrintf("ROUTE: NO-ROUTE\n");
+            result = 0;
             break;
     }
 
 
+    plhs[0]         = mxCreateDoubleScalar((double)result);
 
 
     return;

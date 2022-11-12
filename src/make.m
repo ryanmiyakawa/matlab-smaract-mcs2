@@ -1,1 +1,1 @@
-mex +smaract/mcs_bridge.c -I"..\SDK-MCS2\include" -L"..\SDK-MCS2\lib64" -lSmarActCTL.lib -outdir +smaract
+mex +smaract\mcs_bridge.c -I"..\SDK-MCS2\include" -I"+smaract" -L"..\SDK-MCS2\lib64" -lSmarActCTL.lib -outdir +smaract
