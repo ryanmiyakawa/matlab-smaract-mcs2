@@ -91,9 +91,9 @@ classdef MCS2 < handle %smaract.MCSAbstract2
             l = this.lConnected;
         end
 
-        %@param {uint32} channel.  Use -1 for all channels
+        %@param {uint32} channel.  Defaults to all channels, or pass -1 for all channels
         function l = getIsReferenced(this, u32Channel)
-            if (u32Channel == -1)
+            if (u32Channel == -1 || nargin == 1)
                 ls = zeros(1, this.dNumChannels);
                 for k = 1 : this.dNumChannels
                     u32Channel = k - 1;
