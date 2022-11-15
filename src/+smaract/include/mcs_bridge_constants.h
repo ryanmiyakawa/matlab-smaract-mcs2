@@ -23,5 +23,6 @@ Define bridge constants for routing bridge functions
 #define BF_IS_REFERENCED                9
 #define BF_IS_CHANNEL_ACTIVE            10
 #define BF_SA_SA_CTL_Stop               11
+#define BF_SA_CTL_Calibrate             12
 
 #endif // MCS_BRIDGE_CONSTANTS_H
