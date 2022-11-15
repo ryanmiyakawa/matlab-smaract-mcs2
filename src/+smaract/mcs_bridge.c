@@ -19,6 +19,7 @@
 SA_CTL_Result_t result;
 SA_CTL_DeviceHandle_t dHandle;
 
+bool lDebug = false;
 
 void revord(char *input_buf, size_t buflen, char *output_buf)
 {
@@ -69,7 +70,7 @@ SA_CTL_Result_t MXB_LIST_DEVICES(){
 
 SA_CTL_Result_t MXB_SA_CTL_Open(uint32_t* dhandle, const char* locator)
 {
-    mexPrintf("ROUTE: OPEN");
+    if (lDebug) mexPrintf("ROUTE: OPEN");
 
     // Open the first MCS2 device from the list
     result = SA_CTL_Open(&dHandle, locator, "");
@@ -136,7 +137,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
     char *locator;
 
     if (nrhs == 0){
-        mexPrintf("MCS2: No input arguments. ROUTE required\n");
+        if (lDebug) mexPrintf("MCS2: No input arguments. ROUTE required\n");
         return;
     }
 
@@ -155,18 +156,18 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
     switch(route){
         case BF_LIST_DEVICES:
-            mexPrintf("ROUTE: BF_LIST_DEVICES\n");
+            if (lDebug) mexPrintf("ROUTE: BF_LIST_DEVICES\n");
             result = MXB_LIST_DEVICES();
             break;  
         case BF_SA_CTL_Open:
-            mexPrintf("ROUTE: SA_CTL_Open\n");
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_Open\n");
 
             // require 2 arguments
             returnIfInsufficientArgs(nrhs, 2);
 
             locator = mxArrayToString(prhs[1]);
 
-            // mexPrintf("locator: %s\n", locator);
+            // if (lDebug) mexPrintf("locator: %s\n", locator);
             result = MXB_SA_CTL_Open(dHandle, locator);
             // dHandle = 0;
 
@@ -174,13 +175,13 @@ void mexFunction(int nlhs, mxArray *plhs[],
             break;  
 
         case BA_SA_CTL_OpenFirstDevice:
-            mexPrintf("ROUTE: BA_SA_CTL_OpenFirstDevice\n");
+            if (lDebug) mexPrintf("ROUTE: BA_SA_CTL_OpenFirstDevice\n");
             result = MXB_SA_CTL_OpenFirstDevice(dHandle);
             plhs[1] = mxCreateDoubleScalar((double)dHandle);
             break;  
 
         case BF_SA_CTL_Close:
-            mexPrintf("ROUTE: SA_CTL_Close\n");
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_Close\n");
 
             // require 2 arguments
             returnIfInsufficientArgs(nrhs, 1);
@@ -189,7 +190,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             break;
 
         case BF_IS_REFERENCED:
-            mexPrintf("ROUTE: IS_REFERENCED\n");
+            if (lDebug) mexPrintf("ROUTE: IS_REFERENCED\n");
 
             // require 3 arguments
             returnIfInsufficientArgs(nrhs, 3);
@@ -202,7 +203,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
             break;
         case BF_SA_CTL_Reference:
-            mexPrintf("ROUTE: SA_CTL_Reference channel: %d.\n", channel);
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_Reference channel: %d.\n", channel);
 
             returnIfInsufficientArgs(nrhs, 3);
 
@@ -218,8 +219,20 @@ void mexFunction(int nlhs, mxArray *plhs[],
             result = SA_CTL_Reference(dHandle, channel, 0);
 
             break;
+
+        case BF_SA_SA_CTL_Stop:
+            returnIfInsufficientArgs(nrhs, 2);
+            result = SA_CTL_Stop(dHandle, channel, 0);
+            exitOnError(result);
+            break;
+        case BF_SA_CTL_Calibrate:
+            returnIfInsufficientArgs(nrhs, 2);
+            result = SA_CTL_Calibrate(dHandle, channel, 0);
+            exitOnError(result);
+            break;
+
         case BF_IS_CHANNEL_ACTIVE:
-            mexPrintf("ROUTE: BF_IS_CHANNEL_ACTIVE\n");
+            if (lDebug) mexPrintf("ROUTE: BF_IS_CHANNEL_ACTIVE\n");
 
             // require 3 arguments
             returnIfInsufficientArgs(nrhs, 3);
@@ -233,7 +246,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             break;
 
         case BF_SA_CTL_GetProperty_i64:
-            mexPrintf("ROUTE: SA_CTL_GetProperty_i64\n");
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_GetProperty_i64\n");
 
             // require 4 arguments
             returnIfInsufficientArgs(nrhs, 4);
@@ -246,7 +259,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             plhs[1]         = mxCreateDoubleScalar((double)val64);
             break;
         case BF_SA_CTL_GetProperty_i32:
-            mexPrintf("ROUTE: SA_CTL_GetProperty_i32\n");
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_GetProperty_i32\n");
 
             // require 4 arguments
             returnIfInsufficientArgs(nrhs, 4);
@@ -260,7 +273,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             plhs[1]         = mxCreateDoubleScalar((double)val32);
             break;
         case BF_SA_CTL_SetProperty_i64:
-            mexPrintf("ROUTE: SA_CTL_SetProperty_i64\n");
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_SetProperty_i64\n");
 
             // require 5 arguments
             returnIfInsufficientArgs(nrhs, 5);
@@ -275,7 +288,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
         break;
         case BF_SA_CTL_SetProperty_i32:
-            mexPrintf("ROUTE: SA_CTL_SetProperty_i32\n");
+            if (lDebug) mexPrintf("ROUTE: SA_CTL_SetProperty_i32\n");
            
             // require 5 arguments
             returnIfInsufficientArgs(nrhs, 5);
@@ -293,7 +306,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
 
         default:
-            mexPrintf("ROUTE: NO-ROUTE\n");
+            if (lDebug) mexPrintf("ROUTE: NO-ROUTE\n");
             result = 0;
             break;
     }

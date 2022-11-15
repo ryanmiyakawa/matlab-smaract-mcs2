@@ -22,5 +22,6 @@ Define bridge constants for routing bridge functions
 #define BA_SA_CTL_OpenFirstDevice       8
 #define BF_IS_REFERENCED                9
 #define BF_IS_CHANNEL_ACTIVE            10
+#define BF_SA_SA_CTL_Stop               11
 
 #endif // MCS_BRIDGE_CONSTANTS_H

@@ -24,7 +24,7 @@ classdef MCS2Abstract < handle
         disconnect(this)
 
         this = connect(this, cLocation)
-  
+
         
     end
     
