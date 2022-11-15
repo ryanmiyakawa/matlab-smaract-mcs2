@@ -5,8 +5,8 @@ classdef MCS2 < handle %smaract.MCSAbstract2
     end
 
     properties 
-        % u64SAConstants = struct()
-        % u64SAErrorConstants = struct()
+        u64SAConstants = struct()
+        u64SAErrorConstants = struct()
     end
     
     properties (Access = protected)
@@ -14,8 +14,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
 
         lConnected = false
 
-        u64SAConstants = struct()
-        u64SAErrorConstants = struct()
+
 
         dNumChannels = 1
         u32CLFrequency = 6000
@@ -93,6 +92,11 @@ classdef MCS2 < handle %smaract.MCSAbstract2
 
         %@param {uint32} channel.  Defaults to all channels, or pass -1 for all channels
         function l = getIsReferenced(this, u32Channel)
+            if (~this.lConnected)
+                l = false;
+                return
+            end
+
             if (u32Channel == -1 || nargin == 1)
                 ls = zeros(1, this.dNumChannels);
                 for k = 1 : this.dNumChannels
@@ -187,7 +191,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
     methods (Access = protected)
 
         function this = defineSAConstants(this)
-            cBridgeHeaderPath = fullfile(fileparts(mfilename('fullpath')), 'mcs_bridge_constants.h');
+            cBridgeHeaderPath = fullfile(fileparts(mfilename('fullpath')), 'include',  'mcs_bridge_constants.h');
             fid = fopen(cBridgeHeaderPath, 'r');
 
             % read each line:
@@ -202,6 +206,8 @@ classdef MCS2 < handle %smaract.MCSAbstract2
             %     disp(tline)
                 tline = fgetl(fid);
             end
+
+            fclose(fid);
 
             u64SAConstantsPath = fullfile(fileparts(mfilename('fullpath')), '..', '..', 'SDK-MCS2', 'include',  'SmarActControlConstants.h');
             fid = fopen(u64SAConstantsPath, 'r');
@@ -228,6 +234,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
 
                 tline = fgetl(fid);
             end
+            fclose(fid);
         end
        
         function printStatusOfMovement(this, u64Status)
