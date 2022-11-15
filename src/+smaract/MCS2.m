@@ -116,6 +116,10 @@ classdef MCS2 < handle %smaract.MCSAbstract2
         
         % returns the position of the sensor in nm
         function i64Position = getPosition(this, u32Channel)
+            if (~this.getIsReferenced(u32Channel))
+                i64Position = 0;
+                return
+            end
             [dResult, i64Position] = this.getPropertyI64(u32Channel, this.u64SAConstants.SA_CTL_PKEY_POSITION);
             this.printStatusOfError(dResult);            
         end
