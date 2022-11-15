@@ -196,7 +196,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             returnIfInsufficientArgs(nrhs, 3);
 
             result = SA_CTL_GetProperty_i32(dHandle, channel, SA_CTL_PKEY_CHANNEL_STATE, &state, 0);
-            bool isReferenced = (state & SA_CTL_CH_STATE_IS_REFERENCED) != 0;
+            bool isReferenced = (state & SA_CTL_CH_STATE_BIT_IS_REFERENCED) != 0;
 
             exitOnError(result);
             plhs[1]         = mxCreateDoubleScalar((double)isReferenced);

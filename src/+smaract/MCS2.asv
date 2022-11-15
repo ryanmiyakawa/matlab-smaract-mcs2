@@ -38,7 +38,10 @@ classdef MCS2 < handle %smaract.MCSAbstract2
                     this.(varargin{k}) = varargin{k + 1};
                 end
             end
+            
         end
+        
+        
         
         %@param {uint32} absolute position to move to in pm
         function dResult = goToPositionAbsolute(this, u32Channel, i64Position)
@@ -57,11 +60,11 @@ classdef MCS2 < handle %smaract.MCSAbstract2
            if (u32Channel == -1)
                 for k = 1:this.dNumChannels
                     u32Channel = k - 1;
-                    this.calibrate(u32Channel)
+                    this.findReferenceMark(u32Channel)
                 end
                 return
             end
-            dResult = smaract.mcs_bridge(this.u64SAConstants.BF_SA_CTL_Calibrate, this.dHandle, u32Channel);        
+            dResult = smaract.mcs_bridge(this.u64SAConstants.BF_SA_CTL_Reference, this.dHandle, u32Channel);        
             this.printStatusOfError(dResult);
         end
 
