@@ -38,10 +38,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
                     this.(varargin{k}) = varargin{k + 1};
                 end
             end
-            
         end
-        
-        
         
         %@param {uint32} absolute position to move to in pm
         function dResult = goToPositionAbsolute(this, u32Channel, i64Position)
@@ -50,7 +47,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
                  return
              end
               
-            dResult = this.setPropertyI64(u32Channel, this.u64SAConstants.SA_CTL_PKEY_POSITION, i64Position);
+            dResult = smaract.mcs_bridge(this.u64SAConstants.BF_SA_CTL_Move, this.dHandle, u32Channel, i64P);      
             this.printStatusOfError(dResult);
             
         end
@@ -60,11 +57,11 @@ classdef MCS2 < handle %smaract.MCSAbstract2
            if (u32Channel == -1)
                 for k = 1:this.dNumChannels
                     u32Channel = k - 1;
-                    this.findReferenceMark(u32Channel)
+                    this.calibrate(u32Channel)
                 end
                 return
             end
-            dResult = smaract.mcs_bridge(this.u64SAConstants.BF_SA_CTL_Reference, this.dHandle, u32Channel);        
+            dResult = smaract.mcs_bridge(this.u64SAConstants.BF_SA_CTL_Calibrate, this.dHandle, u32Channel);        
             this.printStatusOfError(dResult);
         end
 
@@ -119,6 +116,10 @@ classdef MCS2 < handle %smaract.MCSAbstract2
         
         % returns the position of the sensor in nm
         function i64Position = getPosition(this, u32Channel)
+            if (~this.getIsReferenced(u32Channel))
+                i64Position = 0;
+                return
+            end
             [dResult, i64Position] = this.getPropertyI64(u32Channel, this.u64SAConstants.SA_CTL_PKEY_POSITION);
             this.printStatusOfError(dResult);            
         end
@@ -339,7 +340,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
 
         function [dStatus, i32Val] = getPropertyI32(this, u32Channel, i32Property)
             [dStatus, i32Val] = smaract.mcs_bridge(...
-                    this.u64SAConstants.BF_SA_CTL_SetProperty_i32, ...
+                    this.u64SAConstants.BF_SA_CTL_GetProperty_i32, ...
                     this.dHandle, ...
                     u32Channel, ...
                     i32Property); 

@@ -26,11 +26,15 @@ dPosition = stage.getPosition(0)
 
 % move to position:
 channel = 0;
-dPos = 1000000;
+dPos = 1e9;
 dResult = stage.goToPositionAbsolute(channel, dPos);
 
+dPosition = stage.getPosition(0)
+dPos = 0;
+dResult = stage.goToPositionAbsolute(channel, dPos);
 
 dPosition = stage.getPosition(0)
+
 
 %% Disconnect
 stage.disconnect();

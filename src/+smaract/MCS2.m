@@ -47,7 +47,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
                  return
              end
               
-            dResult = this.setPropertyI64(u32Channel, this.u64SAConstants.SA_CTL_PKEY_POSITION, i64Position);
+            dResult = smaract.mcs_bridge(this.u64SAConstants.BF_SA_CTL_Move, this.dHandle, u32Channel, i64Position);      
             this.printStatusOfError(dResult);
             
         end
@@ -340,7 +340,7 @@ classdef MCS2 < handle %smaract.MCSAbstract2
 
         function [dStatus, i32Val] = getPropertyI32(this, u32Channel, i32Property)
             [dStatus, i32Val] = smaract.mcs_bridge(...
-                    this.u64SAConstants.BF_SA_CTL_SetProperty_i32, ...
+                    this.u64SAConstants.BF_SA_CTL_GetProperty_i32, ...
                     this.dHandle, ...
                     u32Channel, ...
                     i32Property); 

@@ -153,6 +153,8 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
 
     uint32_t route = (uint32_t) mxGetScalar(prhs[0]);
+    int32_t moveMode = SA_CTL_MOVE_MODE_CL_ABSOLUTE;
+    int64_t moveValue;
 
     switch(route){
         case BF_LIST_DEVICES:
@@ -167,9 +169,8 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
             locator = mxArrayToString(prhs[1]);
 
-            // if (lDebug) mexPrintf("locator: %s\n", locator);
             result = MXB_SA_CTL_Open(dHandle, locator);
-            // dHandle = 0;
+
 
             plhs[1] = mxCreateDoubleScalar((double)dHandle);
             break;  
@@ -244,6 +245,24 @@ void mexFunction(int nlhs, mxArray *plhs[],
             plhs[1]         = mxCreateDoubleScalar((double)isActive);
 
             break;
+
+        case BF_SA_CTL_Move:
+
+            returnIfInsufficientArgs(nrhs, 4);
+
+            moveValue = (int64_t) mxGetScalar(prhs[3]);
+
+            // Set move velocity [in pm/s].
+            result = SA_CTL_SetProperty_i64(dHandle, channel, SA_CTL_PKEY_MOVE_VELOCITY, 1000000000);
+            exitOnError(result);
+            // Set move acceleration [in pm/s2].
+            result = SA_CTL_SetProperty_i64(dHandle, channel, SA_CTL_PKEY_MOVE_ACCELERATION, 1000000000);
+            exitOnError(result);
+
+            result = SA_CTL_Move(dHandle, channel, moveValue, 0);
+
+
+        break;
 
         case BF_SA_CTL_GetProperty_i64:
             if (lDebug) mexPrintf("ROUTE: SA_CTL_GetProperty_i64\n");
